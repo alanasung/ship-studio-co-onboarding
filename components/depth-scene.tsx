@@ -38,7 +38,7 @@ export function DepthScene({ children, intensity = 1, className = '' }: DepthSce
         '--mouse-y': '0',
         '--depth-intensity': intensity,
       } as React.CSSProperties}
-      className={`relative w-full h-full overflow-hidden ${className}`}
+      className={`relative w-full min-h-full overflow-visible ${className}`}
     >
       {children}
     </div>

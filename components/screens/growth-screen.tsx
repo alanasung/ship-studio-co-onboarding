@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { PirateScroll, NextButton, ScrollButton } from '@/components/pirate-scroll'
 import { ding } from '@/lib/audio'
+import { SoundButton } from '@/components/sound-button'
 
 interface GrowthScreenProps {
   posts: string[]
@@ -159,7 +160,7 @@ export function GrowthScreen({
       </div>
 
       <div className="flex items-center gap-4">
-        <button
+        <SoundButton
           ref={verifyButtonRef}
           onClick={handleVerify} 
           disabled={filledPosts.length < 3 || isVerifying || verified}
@@ -170,7 +171,7 @@ export function GrowthScreen({
             }`}
         >
           {isVerifying ? 'Verifying...' : verified ? 'Verified!' : 'Verify Posts'}
-        </button>
+        </SoundButton>
         
         {verified && <span className="font-mono text-seafoam">+{validPosts.length * 5} Doubloons!</span>}
       </div>
