@@ -26,6 +26,8 @@ export function getCounterPosition(): CoinPosition | null {
 export function DoubloonCounter({ count, showAnimation }: DoubloonCounterProps) {
   const [isPulsing, setIsPulsing] = useState(false)
   const [showGlow, setShowGlow] = useState(false)
+  const [floatingAmount, setFloatingAmount] = useState<number | null>(null)
+  const [coinStack, setCoinStack] = useState(false)
   const counterRef = useRef<HTMLDivElement>(null)
   const prevCountRef = useRef(count)
 
@@ -47,12 +49,26 @@ export function DoubloonCounter({ count, showAnimation }: DoubloonCounterProps) 
     }
   }, [])
 
-  // Trigger glow effect when count increases
+  // Trigger effects when count increases
   useEffect(() => {
-    if (count > prevCountRef.current) {
+    const diff = count - prevCountRef.current
+    if (diff > 0) {
       setShowGlow(true)
+      setFloatingAmount(diff)
+      
+      // Show coin stack for larger amounts
+      if (diff >= 10) {
+        setCoinStack(true)
+        setTimeout(() => setCoinStack(false), 800)
+      }
+      
       const glowTimer = setTimeout(() => setShowGlow(false), 500)
-      return () => clearTimeout(glowTimer)
+      const floatTimer = setTimeout(() => setFloatingAmount(null), 800)
+      
+      return () => {
+        clearTimeout(glowTimer)
+        clearTimeout(floatTimer)
+      }
     }
     prevCountRef.current = count
   }, [count])
@@ -82,6 +98,43 @@ export function DoubloonCounter({ count, showAnimation }: DoubloonCounterProps) 
         />
       )}
       
+      {/* Floating +N indicator */}
+      {floatingAmount !== null && (
+        <div 
+          className="absolute -top-8 left-1/2 -translate-x-1/2 font-mono font-bold text-parchment text-lg"
+          style={{ animation: 'float-up-fade 800ms ease-out forwards' }}
+        >
+          +{floatingAmount}
+        </div>
+      )}
+      
+      {/* Mini coin stack for large earnings */}
+      {coinStack && (
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col-reverse items-center">
+          {[0, 1, 2].map(i => (
+            <div 
+              key={i}
+              className="w-4 h-4"
+              style={{ 
+                animation: `coin-stack-flip 600ms ease-out ${i * 100}ms forwards`,
+                marginTop: i > 0 ? '-8px' : 0,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 28 28">
+                <defs>
+                  <radialGradient id={`stackCoin${i}`} cx="30%" cy="30%">
+                    <stop offset="0%" stopColor="#e5b84a" />
+                    <stop offset="50%" stopColor="#c9922a" />
+                    <stop offset="100%" stopColor="#8b6914" />
+                  </radialGradient>
+                </defs>
+                <circle cx="14" cy="14" r="13" fill={`url(#stackCoin${i})`} stroke="#8b6914" strokeWidth="1" />
+              </svg>
+            </div>
+          ))}
+        </div>
+      )}
+      
       <div className={`relative ${isPulsing ? 'animate-counter-pulse' : ''}`}>
         <CoinSVG size={28} />
       </div>
@@ -95,6 +148,15 @@ export function DoubloonCounter({ count, showAnimation }: DoubloonCounterProps) 
         @keyframes counter-glow-ring {
           0% { transform: scale(1); opacity: 1; }
           100% { transform: scale(1.3); opacity: 0; }
+        }
+        @keyframes float-up-fade {
+          0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+          100% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        }
+        @keyframes coin-stack-flip {
+          0% { transform: scale(0) rotateY(0deg); opacity: 1; }
+          50% { transform: scale(1.2) rotateY(180deg); opacity: 1; }
+          100% { transform: scale(1) rotateY(360deg); opacity: 0; }
         }
       `}</style>
     </div>
@@ -136,10 +198,11 @@ interface FlyingCoinProps {
   startX: number
   startY: number
   delay?: number
+  variance?: number
   onComplete: () => void
 }
 
-export function FlyingCoin({ startX, startY, delay = 0, onComplete }: FlyingCoinProps) {
+export function FlyingCoin({ startX, startY, delay = 0, variance = 0, onComplete }: FlyingCoinProps) {
   const [isAnimating, setIsAnimating] = useState(false)
   const [cssVars, setCssVars] = useState<React.CSSProperties>({})
 
@@ -151,10 +214,12 @@ export function FlyingCoin({ startX, startY, delay = 0, onComplete }: FlyingCoin
         return
       }
 
-      // Calculate the arc parameters
-      const deltaX = target.x - startX
-      const deltaY = target.y - startY
-      const peakY = -120 // Rise 120px above midpoint
+      // Calculate the arc parameters with variance
+      const offsetX = (Math.random() - 0.5) * variance * 2
+      const offsetY = (Math.random() - 0.5) * variance * 2
+      const deltaX = target.x - (startX + offsetX)
+      const deltaY = target.y - (startY + offsetY)
+      const peakY = -80 - Math.random() * 60 // Variable arc height
 
       setCssVars({
         '--end-x': `${deltaX}px`,
@@ -165,12 +230,12 @@ export function FlyingCoin({ startX, startY, delay = 0, onComplete }: FlyingCoin
       setIsAnimating(true)
 
       // Complete after animation
-      const completeTimer = setTimeout(onComplete, 800)
+      const completeTimer = setTimeout(onComplete, 700)
       return () => clearTimeout(completeTimer)
     }, delay)
 
     return () => clearTimeout(startTimer)
-  }, [startX, startY, delay, onComplete])
+  }, [startX, startY, delay, variance, onComplete])
 
   if (!isAnimating) return null
 
@@ -178,14 +243,14 @@ export function FlyingCoin({ startX, startY, delay = 0, onComplete }: FlyingCoin
     <div 
       style={{
         position: 'fixed',
-        left: startX - 24,
-        top: startY - 24,
+        left: startX - 20,
+        top: startY - 20,
         zIndex: 100,
-        animation: 'coin-arc-fly 800ms ease-out forwards',
+        animation: 'coin-arc-fly 700ms ease-out forwards',
         ...cssVars,
       }}
     >
-      <CoinSVG size={48} />
+      <CoinSVG size={40} />
     </div>
   )
 }
@@ -226,17 +291,22 @@ export function CoinAnimation({ onComplete }: { onComplete: () => void }) {
   )
 }
 
-// Hook to manage multiple flying coins
+// Hook to manage multiple flying coins with abundance
 export function useFlyingCoins() {
-  const [coins, setCoins] = useState<{ id: string; x: number; y: number; delay: number }[]>([])
+  const [coins, setCoins] = useState<{ id: string; x: number; y: number; delay: number; variance: number }[]>([])
 
-  const triggerCoins = useCallback((count: number, originX: number, originY: number) => {
-    const newCoins = Array.from({ length: count }, (_, i) => ({
+  const triggerCoins = useCallback((amount: number, originX: number, originY: number) => {
+    // Fire multiple coins based on amount: ceil(amount / 2)
+    const coinCount = Math.min(Math.ceil(amount / 2), 8) // Cap at 8 coins
+    
+    const newCoins = Array.from({ length: coinCount }, (_, i) => ({
       id: crypto.randomUUID(),
-      x: originX,
-      y: originY,
-      delay: i * 150,
+      x: originX + (Math.random() - 0.5) * 30, // Random offset
+      y: originY + (Math.random() - 0.5) * 30,
+      delay: i * 60, // Stagger 60ms apart
+      variance: 15, // Random trajectory variance
     }))
+    
     setCoins(prev => [...prev, ...newCoins])
   }, [])
 
@@ -252,6 +322,7 @@ export function useFlyingCoins() {
           startX={coin.x}
           startY={coin.y}
           delay={coin.delay}
+          variance={coin.variance}
           onComplete={() => removeCoin(coin.id)}
         />
       ))}

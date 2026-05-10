@@ -1,19 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { celebration } from '@/lib/sounds'
 
 type CoinSize = 'small' | 'medium' | 'large'
 
-interface FallingCoin {
+interface PhysicsCoin {
   id: number
   x: number
-  drift: number
-  duration: number
-  delay: number
+  y: number
+  vx: number
+  vy: number
   size: CoinSize
   rotation: number
   rotationSpeed: number
+  bounceCount: number
+  opacity: number
 }
 
 const coinSizes: Record<CoinSize, number> = {
@@ -21,6 +23,12 @@ const coinSizes: Record<CoinSize, number> = {
   medium: 28,
   large: 40,
 }
+
+const GRAVITY = 0.5
+const AIR_RESISTANCE = 0.995
+const BOUNCE_DAMPING = 0.6
+const GROUND_Y = typeof window !== 'undefined' ? window.innerHeight * 0.85 : 600
+const MAX_BOUNCES = 3
 
 function getCoinSize(): CoinSize {
   const rand = Math.random()
@@ -38,33 +46,100 @@ export function DoubloonShower({
   onComplete: () => void
   count?: number
 }) {
-  const [coins, setCoins] = useState<FallingCoin[]>([])
+  const [coins, setCoins] = useState<PhysicsCoin[]>([])
+  const animationRef = useRef<number | null>(null)
+  const startTimeRef = useRef<number>(0)
+
+  // Physics simulation
+  const updatePhysics = useCallback(() => {
+    setCoins(prevCoins => {
+      const now = Date.now()
+      const elapsed = now - startTimeRef.current
+      
+      // Fade out after 2 seconds
+      const fadeStart = 2000
+      const fadeDuration = 500
+      
+      return prevCoins.map(coin => {
+        let { x, y, vx, vy, bounceCount, opacity, rotation, rotationSpeed } = coin
+        
+        // Apply gravity
+        vy += GRAVITY
+        
+        // Apply air resistance
+        vx *= AIR_RESISTANCE
+        vy *= AIR_RESISTANCE
+        
+        // Update position
+        x += vx
+        y += vy
+        
+        // Update rotation
+        rotation += rotationSpeed * 0.016 // ~60fps
+        
+        // Bounce off ground
+        if (y >= GROUND_Y && bounceCount < MAX_BOUNCES) {
+          y = GROUND_Y
+          vy = -vy * BOUNCE_DAMPING
+          vx *= 0.8 // Friction
+          bounceCount++
+          rotationSpeed *= 0.7
+        }
+        
+        // Calculate opacity for fade out
+        if (elapsed > fadeStart) {
+          opacity = Math.max(0, 1 - (elapsed - fadeStart) / fadeDuration)
+        }
+        
+        return { ...coin, x, y, vx, vy, bounceCount, opacity, rotation, rotationSpeed }
+      }).filter(coin => coin.opacity > 0)
+    })
+    
+    animationRef.current = requestAnimationFrame(updatePhysics)
+  }, [])
 
   useEffect(() => {
     if (active) {
-      // Generate coins with varied sizes and rotations
-      const newCoins = Array.from({ length: count }, (_, i) => ({
+      startTimeRef.current = Date.now()
+      
+      // Generate coins with physics properties
+      const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 800
+      const newCoins: PhysicsCoin[] = Array.from({ length: count }, (_, i) => ({
         id: i,
-        x: Math.random() * 100,
-        drift: (Math.random() - 0.5) * 100,
-        duration: 2 + Math.random() * 1.5,
-        delay: Math.random() * 0.5,
+        x: Math.random() * windowWidth,
+        y: -50 - Math.random() * 200, // Start above screen, staggered
+        vx: (Math.random() - 0.5) * 8, // Random horizontal velocity
+        vy: Math.random() * 3 + 2, // Slight downward velocity
         size: getCoinSize(),
         rotation: Math.random() * 360,
-        rotationSpeed: 180 + Math.random() * 360, // 180-540 degrees per fall
+        rotationSpeed: 180 + Math.random() * 360,
+        bounceCount: 0,
+        opacity: 1,
       }))
+      
       setCoins(newCoins)
       celebration()
+      
+      // Start physics simulation
+      animationRef.current = requestAnimationFrame(updatePhysics)
 
       // Complete after animation
       const timer = setTimeout(() => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current)
+        }
         setCoins([])
         onComplete()
-      }, 2500)
+      }, 3000)
 
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(timer)
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current)
+        }
+      }
     }
-  }, [active, count, onComplete])
+  }, [active, count, onComplete, updatePhysics])
 
   if (!active || coins.length === 0) return null
 
@@ -76,7 +151,7 @@ export function DoubloonShower({
         style={{ animation: 'fade-out 1s ease-out forwards' }}
       />
 
-      {/* Falling coins */}
+      {/* Physics-driven falling coins */}
       {coins.map(coin => {
         const pixelSize = coinSizes[coin.size]
         return (
@@ -84,22 +159,14 @@ export function DoubloonShower({
             key={coin.id}
             className="absolute"
             style={{
-              left: `${coin.x}%`,
-              top: -50,
-              '--drift': `${coin.drift}px`,
-              '--coin-rotation': `${coin.rotation}deg`,
-              '--coin-rotation-end': `${coin.rotation + coin.rotationSpeed}deg`,
-              animation: `coin-fall ${coin.duration}s ease-in ${coin.delay}s forwards`,
-            } as React.CSSProperties}
+              left: coin.x,
+              top: coin.y,
+              opacity: coin.opacity,
+              transform: `rotate(${coin.rotation}deg)`,
+              willChange: 'transform, left, top',
+            }}
           >
-            <svg 
-              width={pixelSize} 
-              height={pixelSize} 
-              viewBox="0 0 28 28"
-              style={{
-                animation: `coin-spin ${coin.duration}s linear ${coin.delay}s forwards`,
-              }}
-            >
+            <svg width={pixelSize} height={pixelSize} viewBox="0 0 28 28">
               <defs>
                 <radialGradient id={`showerCoin${coin.id}`} cx="30%" cy="30%">
                   <stop offset="0%" stopColor="#e5b84a" />
@@ -126,21 +193,32 @@ export function DoubloonShower({
         )
       })}
 
+      {/* Coin pile at bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at bottom, rgba(201, 146, 42, 0.3) 0%, transparent 70%)',
+          animation: 'fade-in-out 3s ease-in-out forwards',
+        }}
+      />
+
       <style jsx>{`
         @keyframes fade-out {
           from { opacity: 1; }
           to { opacity: 0; }
         }
-        @keyframes coin-spin {
-          from { transform: rotate(var(--coin-rotation)); }
-          to { transform: rotate(var(--coin-rotation-end)); }
+        @keyframes fade-in-out {
+          0% { opacity: 0; }
+          30% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { opacity: 0; }
         }
       `}</style>
     </div>
   )
 }
 
-// Particle burst for individual doubloon earns
+// Enhanced particle burst with gold flecks
 export function ParticleBurst({ 
   x, 
   y, 
@@ -152,22 +230,31 @@ export function ParticleBurst({
   active: boolean
   onComplete: () => void
 }) {
-  const [particles, setParticles] = useState<{ id: number; tx: number; ty: number; rotation: number }[]>([])
+  const [particles, setParticles] = useState<{ 
+    id: number
+    tx: number
+    ty: number
+    rotation: number
+    scale: number
+    shape: 'circle' | 'trapezoid'
+  }[]>([])
 
   useEffect(() => {
     if (active) {
-      const newParticles = Array.from({ length: 10 }, (_, i) => ({
+      const newParticles = Array.from({ length: 16 }, (_, i) => ({
         id: i,
-        tx: (Math.random() - 0.5) * 150,
-        ty: (Math.random() - 0.5) * 150 - 50, // Bias upward
+        tx: (Math.random() - 0.5) * 180,
+        ty: (Math.random() - 0.5) * 180 - 60, // Bias upward
         rotation: Math.random() * 360,
+        scale: 0.5 + Math.random() * 0.8,
+        shape: (i % 3 === 0 ? 'trapezoid' : 'circle') as 'circle' | 'trapezoid',
       }))
       setParticles(newParticles)
 
       const timer = setTimeout(() => {
         setParticles([])
         onComplete()
-      }, 600)
+      }, 700)
 
       return () => clearTimeout(timer)
     }
@@ -183,14 +270,22 @@ export function ParticleBurst({
       {particles.map(p => (
         <div
           key={p.id}
-          className="absolute w-2 h-2 rounded-full bg-gold"
+          className="absolute"
           style={{
             '--tx': `${p.tx}px`,
             '--ty': `${p.ty}px`,
-            animation: 'particle-burst 600ms ease-out forwards',
-            transform: `rotate(${p.rotation}deg)`,
+            animation: 'particle-burst 700ms ease-out forwards',
+            transform: `rotate(${p.rotation}deg) scale(${p.scale})`,
           } as React.CSSProperties}
-        />
+        >
+          {p.shape === 'circle' ? (
+            <div className="w-2 h-2 rounded-full bg-gold" />
+          ) : (
+            <svg width="8" height="6" viewBox="0 0 8 6">
+              <polygon points="1,6 2,0 6,0 7,6" fill="#c9922a" />
+            </svg>
+          )}
+        </div>
       ))}
     </div>
   )

@@ -379,3 +379,209 @@
   background: currentColor;
   animation: strikethrough 200ms ease-out 100ms forwards;
 }
+
+/* ========== DEPTH SCENE UTILITIES ========== */
+/* Parallax depth layers - each layer moves at different speed based on mouse position */
+.depth-layer-deep {
+  transform: translateZ(-200px) translate(calc(var(--mouse-x, 0) * -20px), calc(var(--mouse-y, 0) * -10px));
+  transform-style: preserve-3d;
+}
+
+.depth-layer-far {
+  transform: translateZ(-100px) translate(calc(var(--mouse-x, 0) * -12px), calc(var(--mouse-y, 0) * -6px));
+  transform-style: preserve-3d;
+}
+
+.depth-layer-mid {
+  transform: translateZ(0) translate(calc(var(--mouse-x, 0) * -6px), calc(var(--mouse-y, 0) * -3px));
+  transform-style: preserve-3d;
+}
+
+.depth-layer-near {
+  transform: translateZ(80px) translate(calc(var(--mouse-x, 0) * 8px), calc(var(--mouse-y, 0) * 4px));
+  transform-style: preserve-3d;
+}
+
+.depth-layer-foreground {
+  transform: translateZ(150px) translate(calc(var(--mouse-x, 0) * 16px), calc(var(--mouse-y, 0) * 8px));
+  transform-style: preserve-3d;
+}
+
+/* Tilt effect for cards and surfaces */
+.depth-tilt {
+  transform: rotateX(calc(var(--mouse-y, 0) * -2deg)) rotateY(calc(var(--mouse-x, 0) * 2deg));
+  transition: transform 200ms ease-out;
+  transform-style: preserve-3d;
+}
+
+/* Card hover lift effect */
+.depth-card-hover {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.depth-card-hover:hover {
+  transform: translateZ(20px) rotateX(calc(var(--mouse-y, 0) * -4deg)) rotateY(calc(var(--mouse-x, 0) * 4deg));
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(201, 146, 42, 0.2);
+}
+
+/* Button press effect */
+.depth-button-press {
+  transition: transform 100ms ease-out, filter 100ms ease-out;
+}
+
+.depth-button-press:active {
+  transform: translateZ(-4px) scale(0.98);
+  filter: brightness(0.9);
+}
+
+/* Camera shake for immersion */
+@keyframes camera-shake {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
+  75% { transform: translateY(2px); }
+}
+
+.animate-camera-shake {
+  animation: camera-shake 0.67s ease-in-out infinite;
+}
+
+/* Lantern swing animation */
+@keyframes lantern-swing {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.animate-lantern-swing {
+  animation: lantern-swing 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* Lighthouse beam sweep */
+@keyframes lighthouse-beam {
+  0% { transform: rotate(-30deg); opacity: 0.3; }
+  15% { opacity: 0.6; }
+  30% { transform: rotate(30deg); opacity: 0.3; }
+  100% { transform: rotate(30deg); opacity: 0; }
+}
+
+.animate-lighthouse-beam {
+  animation: lighthouse-beam 8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Distant ship drift */
+@keyframes ship-drift {
+  0% { transform: translateX(-100px) translateY(0); }
+  50% { transform: translateX(calc(100vw + 100px)) translateY(-5px); }
+  50.1% { transform: translateX(-100px) translateY(0); opacity: 0; }
+  51% { opacity: 0.04; }
+  100% { transform: translateX(calc(100vw + 100px)) translateY(-5px); }
+}
+
+.animate-ship-drift {
+  animation: ship-drift 120s linear infinite;
+}
+
+/* Seagull flight path */
+@keyframes seagull-fly {
+  0% { 
+    transform: translateX(-50px) translateY(0) scaleX(1);
+    opacity: 0;
+  }
+  5% { opacity: 0.3; }
+  50% { 
+    transform: translateX(50vw) translateY(-30px) scaleX(1);
+  }
+  95% { opacity: 0.3; }
+  100% { 
+    transform: translateX(calc(100vw + 50px)) translateY(-10px) scaleX(1);
+    opacity: 0;
+  }
+}
+
+.animate-seagull {
+  animation: seagull-fly 45s linear infinite;
+}
+
+/* Star twinkle variations */
+@keyframes star-twinkle-1 {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes star-twinkle-2 {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(0.7); }
+}
+
+.animate-star-1 { animation: star-twinkle-1 3s ease-in-out infinite; }
+.animate-star-2 { animation: star-twinkle-2 4s ease-in-out infinite; }
+
+/* Wood grain texture overlay */
+.wood-grain-overlay {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(139, 105, 20, 0.03) 2px,
+      rgba(139, 105, 20, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 30px,
+      rgba(92, 74, 31, 0.05) 30px,
+      rgba(92, 74, 31, 0.05) 32px
+    );
+}
+
+/* Oil lamp flicker effect */
+@keyframes lamp-flicker {
+  0%, 100% { opacity: 0.8; }
+  10% { opacity: 0.75; }
+  20% { opacity: 0.85; }
+  30% { opacity: 0.7; }
+  40% { opacity: 0.9; }
+  50% { opacity: 0.8; }
+  60% { opacity: 0.85; }
+  70% { opacity: 0.75; }
+  80% { opacity: 0.9; }
+  90% { opacity: 0.8; }
+}
+
+.animate-lamp-flicker {
+  animation: lamp-flicker 2s ease-in-out infinite;
+}
+
+/* Wax seal stamp animation */
+@keyframes wax-stamp {
+  0% { transform: scale(1.5) rotate(-10deg); filter: drop-shadow(0 0 8px rgba(201, 146, 42, 0.8)); }
+  50% { transform: scale(0.95) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px rgba(201, 146, 42, 0.4)); }
+}
+
+.animate-wax-stamp {
+  animation: wax-stamp 200ms ease-out forwards;
+}
+
+/* Fog layer animation */
+@keyframes fog-layer-drift {
+  0% { transform: translateX(-10%) translateY(0); }
+  50% { transform: translateX(5%) translateY(-2%); }
+  100% { transform: translateX(-10%) translateY(0); }
+}
+
+.animate-fog-layer {
+  animation: fog-layer-drift 30s ease-in-out infinite;
+}
+
+/* Horizon glow pulse */
+@keyframes horizon-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.animate-horizon-glow {
+  animation: horizon-glow 8s ease-in-out infinite;
+}
