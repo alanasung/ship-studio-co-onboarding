@@ -106,10 +106,9 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
   }
 
   return (
-    <DepthScene intensity={0.5}>
-      <div className="fixed inset-0 mesh-gradient-navy flex flex-col items-center justify-center p-4">
-        <NauticalEnvironment timeOfDay="dusk" showShip={true} showLighthouse={false} showSeagulls={true} intensity={0.6} />
-        {showCoinAnimation && <CoinAnimation onComplete={handleAnimationComplete} />}
+    <div className="fixed inset-0 mesh-gradient-navy flex flex-col items-center justify-center p-4">
+      
+      {showCoinAnimation && <CoinAnimation onComplete={handleAnimationComplete} />}
       
       <div className="relative z-10 text-center mb-8">
         <h2 className="font-serif text-3xl md:text-5xl text-parchment mb-3 text-balance">
@@ -164,9 +163,8 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
             : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50'
           }`}
       >
-          Claim 10 Doubloons &rarr;
+        Claim 10 Doubloons &rarr;
       </SoundButton>
-      </div>
-    </DepthScene>
+    </div>
   )
 }

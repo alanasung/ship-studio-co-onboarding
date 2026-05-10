@@ -191,11 +191,10 @@ export function DashboardScreen({
   const completedTasks = engagementTasks.filter(t => t.completed)
 
   return (
-    <div className="relative min-h-screen">
-      <DepthScene intensity={0.5}>
-        <div className="min-h-screen mesh-gradient-navy relative">
-          <NauticalEnvironment timeOfDay="dusk" showShip={true} showLighthouse={false} showSeagulls={true} intensity={0.8} />
-          {/* Header */}
+    <div className="min-h-screen mesh-gradient-navy relative">
+      
+      
+      {/* Header */}
       <header className="relative z-10 border-b border-border/30 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -846,9 +845,7 @@ export function DashboardScreen({
             </div>
           </div>
         </div>
-          )}
-        </div>
-      </DepthScene>
+      )}
     </div>
   )
 }

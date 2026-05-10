@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react'
 import { PirateScroll, NextButton, ScrollButton } from '@/components/pirate-scroll'
 import { ding } from '@/lib/audio'
-import { SoundButton } from '@/components/sound-button'
 
 interface VentureScreenProps {
   posts: string[]
@@ -196,7 +195,7 @@ export function VentureScreen({
       </div>
 
       <div className="flex items-center gap-4">
-        <SoundButton
+        <button
           ref={verifyButtonRef}
           onClick={handleVerify}
           disabled={filledPosts.length < MIN_POSTS || isVerifying || verified}
@@ -207,7 +206,7 @@ export function VentureScreen({
             }`}
         >
           {isVerifying ? 'Verifying...' : verified ? 'Verified!' : 'Verify Posts'}
-        </SoundButton>
+        </button>
         
         {verified && <span className="font-mono text-seafoam">+{validPosts.length * 5} Doubloons!</span>}
       </div>

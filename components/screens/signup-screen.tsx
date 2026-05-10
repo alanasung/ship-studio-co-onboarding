@@ -78,11 +78,10 @@ export function SignupScreen({ initialData, onSubmit }: SignupScreenProps) {
   }
 
   return (
-    <DepthScene intensity={0.5}>
-      <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-y-auto">
-        <NauticalEnvironment timeOfDay="dusk" showShip={true} showLighthouse={false} showSeagulls={true} intensity={0.6} />
+    <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-y-auto">
+      
 
-        {/* Background wheel - blurred and rotating */}
+      {/* Background wheel - blurred and rotating */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.06] blur-xl pointer-events-none overflow-hidden">
         <svg
           width="600"
@@ -290,7 +289,6 @@ export function SignupScreen({ initialData, onSubmit }: SignupScreenProps) {
           </SoundButton>
         </form>
       </div>
-      </div>
-    </DepthScene>
+    </div>
   )
 }
