@@ -62,10 +62,11 @@ export function PirateScroll({
   const showRoleIndicator = currentRoleIndex && totalRoles && totalRoles > 1
 
   return (
-    <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-hidden">
-      
+    <DepthScene intensity={0.5}>
+      <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-hidden">
+        <NauticalEnvironment timeOfDay="dusk" showShip={true} showLighthouse={false} showSeagulls={true} intensity={0.6} />
 
-      {/* Role queue indicator */}
+        {/* Role queue indicator */}
       {showRoleIndicator && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -193,10 +194,11 @@ export function PirateScroll({
       )}
 
       {/* Scene indicator */}
-      <div className="fixed bottom-6 right-6 z-20 font-mono text-parchment/50 text-sm">
-        {currentScene + 1} / {scenes.length}
+        <div className="fixed bottom-6 right-6 z-20 font-mono text-parchment/50 text-sm">
+          {currentScene + 1} / {scenes.length}
+        </div>
       </div>
-    </div>
+    </DepthScene>
   )
 }
 

@@ -191,10 +191,11 @@ export function DashboardScreen({
   const completedTasks = engagementTasks.filter(t => t.completed)
 
   return (
-    <div className="min-h-screen mesh-gradient-navy relative">
-      
-      
-      {/* Header */}
+    <DepthScene intensity={0.5}>
+      <div className="min-h-screen mesh-gradient-navy relative">
+        <NauticalEnvironment timeOfDay="dusk" showShip={true} showLighthouse={false} showSeagulls={true} intensity={0.8} />
+        
+        {/* Header */}
       <header className="relative z-10 border-b border-border/30 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -212,7 +213,7 @@ export function DashboardScreen({
               <h2 className="font-serif text-2xl md:text-3xl text-parchment">
                 Welcome back, {userData.firstName}
               </h2>
-              <button
+              <SoundButton
                 onClick={() => {
                   setEditFormData(userData)
                   setShowEditProfile(true)
@@ -221,7 +222,7 @@ export function DashboardScreen({
                 title="Edit profile"
               >
                 <Pencil className="w-4 h-4" />
-              </button>
+              </SoundButton>
               
               {/* Streak Badge */}
               {currentStreak > 0 && (
@@ -561,7 +562,7 @@ export function DashboardScreen({
                 value={`bounty.sh1p.co/?ref=${referralCode}`}
                 className="flex-1 bg-transparent font-mono text-sm text-parchment/80 outline-none"
               />
-              <button
+              <SoundButton
                 onClick={handleCopyReferral}
                 className="p-2 text-gold hover:text-parchment transition-colors relative"
               >
@@ -571,7 +572,7 @@ export function DashboardScreen({
                     Copied!
                   </span>
                 )}
-              </button>
+              </SoundButton>
             </div>
             
             <p className="font-mono text-xs text-parchment/60">
@@ -671,7 +672,7 @@ export function DashboardScreen({
             <h3 className="font-serif text-xl text-parchment mb-4">Add a Role</h3>
             <div className="flex flex-wrap gap-4">
               {availableRoles.map(role => (
-                <button
+                <SoundButton
                   key={role}
                   onClick={() => onAddRole(role)}
                   className="flex-1 min-w-[200px] p-4 border-2 border-rope/30 rounded-lg 
@@ -679,7 +680,7 @@ export function DashboardScreen({
                 >
                   <div className="text-gold mb-1">{roleLabels[role].icon}</div>
                   <h4 className="font-serif text-lg text-parchment">{roleLabels[role].title}</h4>
-                </button>
+                </SoundButton>
               ))}
             </div>
           </div>
@@ -692,13 +693,13 @@ export function DashboardScreen({
             <p className="font-mono text-parchment/70 text-sm mb-4">
               Apply to join the next SH1P cohort
             </p>
-            <button
+            <SoundButton
               onClick={() => onAddRole('cohort')}
               className="px-6 py-3 bg-gold text-navy font-mono font-bold rounded-lg
                 hover:bg-rope transition-colors"
             >
               Apply Now
-            </button>
+            </SoundButton>
           </div>
         )}
 
@@ -846,7 +847,8 @@ export function DashboardScreen({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DepthScene>
   )
 }
 

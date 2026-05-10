@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { DepthScene } from '@/components/depth-scene'
 import { NauticalEnvironment } from '@/components/nautical-environment'
+import { SoundButton } from '@/components/sound-button'
 import { creak } from '@/lib/sounds'
 
 interface WheelScreenProps {
@@ -435,7 +436,7 @@ export function WheelScreen({ onContinue }: WheelScreenProps) {
           </div>
 
           {/* CTA Button */}
-          <button
+          <SoundButton
             onClick={onContinue}
             className={`mt-8 px-8 py-4 bg-gold text-navy font-mono font-bold text-lg rounded-lg 
               hover:bg-rope transition-all duration-300 hover:scale-105 
@@ -446,7 +447,7 @@ export function WheelScreen({ onContinue }: WheelScreenProps) {
               }`}
           >
             Come Aboard
-          </button>
+          </SoundButton>
         </div>
       </DepthScene>
     </div>
