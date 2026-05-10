@@ -37,6 +37,9 @@ function loadState(): AppState | null {
       if (!parsed.referralCode) parsed.referralCode = ''
       if (parsed.referralCount === undefined) parsed.referralCount = 0
       if (parsed.currentStreak === undefined) parsed.currentStreak = 0
+      if (parsed.dailyQuestClaimedDate === undefined) parsed.dailyQuestClaimedDate = undefined
+      if (parsed.weeklyQuestClaimedWeek === undefined) parsed.weeklyQuestClaimedWeek = undefined
+      if (parsed.profileCompletionRewarded === undefined) parsed.profileCompletionRewarded = false
       return parsed
     }
   } catch {
@@ -178,40 +181,59 @@ export default function BountyApp() {
     }
   }, [state.selectedRoles, setScreen, triggerCoins, checkAndAwardAchievements])
 
-  const earnDoubloons = useCallback((amount: number, reason: string, clickX?: number, clickY?: number) => {
-    // Check streak for posts
-    const isPost = reason.toLowerCase().includes('post')
-    
-    setState(prev => {
-      let finalAmount = amount
-      let newStreak = prev.currentStreak
-      let lastPostDate = prev.lastPostDate
-
-      if (isPost) {
-        const { newStreak: updatedStreak, isStreakActive } = checkStreak(prev.lastPostDate, prev.currentStreak)
-        newStreak = updatedStreak
-        lastPostDate = new Date().toISOString()
-        
-        // Apply streak multiplier (1.5x for 3+ day streak)
-        if (isStreakActive && updatedStreak >= 3) {
-          finalAmount = Math.round(amount * 1.5)
-        }
-      }
-
-      const newEvent: DoubloonEvent = {
-        id: crypto.randomUUID(),
-        amount: finalAmount,
-        reason: finalAmount > amount ? `${reason} (streak bonus!)` : reason,
-        timestamp: new Date(),
-      }
-
-      const newState = {
-        ...prev,
-        doubloons: prev.doubloons + finalAmount,
-        doubloonHistory: [...prev.doubloonHistory, newEvent],
-        currentStreak: newStreak,
-        lastPostDate,
-      }
+const earnDoubloons = useCallback((amount: number, reason: string, clickX?: number, clickY?: number) => {
+  // Check streak for posts
+  const isPost = reason.toLowerCase().includes('post')
+  const isDailyQuest = reason.toLowerCase().includes('daily quest')
+  const isWeeklyQuest = reason.toLowerCase().includes('weekly quest')
+  
+  setState(prev => {
+  let finalAmount = amount
+  let newStreak = prev.currentStreak
+  let lastPostDate = prev.lastPostDate
+  let dailyQuestClaimedDate = prev.dailyQuestClaimedDate
+  let weeklyQuestClaimedWeek = prev.weeklyQuestClaimedWeek
+  
+  if (isPost) {
+  const { newStreak: updatedStreak, isStreakActive } = checkStreak(prev.lastPostDate, prev.currentStreak)
+  newStreak = updatedStreak
+  lastPostDate = new Date().toISOString()
+  
+  // Apply streak multiplier (1.5x for 3+ day streak)
+  if (isStreakActive && updatedStreak >= 3) {
+  finalAmount = Math.round(amount * 1.5)
+  }
+  }
+  
+  // Track daily quest claim
+  if (isDailyQuest) {
+  dailyQuestClaimedDate = new Date().toISOString()
+  }
+  
+  // Track weekly quest claim
+  if (isWeeklyQuest) {
+  const now = new Date()
+  const startOfYear = new Date(now.getFullYear(), 0, 1)
+  const weekNum = Math.ceil((((now.getTime() - startOfYear.getTime()) / 86400000) + startOfYear.getDay() + 1) / 7)
+  weeklyQuestClaimedWeek = `${now.getFullYear()}-W${weekNum}`
+  }
+  
+  const newEvent: DoubloonEvent = {
+  id: crypto.randomUUID(),
+  amount: finalAmount,
+  reason: finalAmount > amount ? `${reason} (streak bonus!)` : reason,
+  timestamp: new Date(),
+  }
+  
+  const newState = {
+  ...prev,
+  doubloons: prev.doubloons + finalAmount,
+  doubloonHistory: [...prev.doubloonHistory, newEvent],
+  currentStreak: newStreak,
+  lastPostDate,
+  dailyQuestClaimedDate,
+  weeklyQuestClaimedWeek,
+  }
 
       // Check achievements
       const { newAchievements, totalReward } = checkAndAwardAchievements(newState)

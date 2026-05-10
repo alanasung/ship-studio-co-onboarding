@@ -205,10 +205,7 @@
   100% { transform: translateX(300%); }
 }
 
-/* Gold gradient for progress bar */
-.progress-gold {
-  background: linear-gradient(90deg, #8b6914 0%, #c9922a 50%, #e5b84a 100%);
-}
+
 
 /* Coin falling animation for doubloon shower */
 @keyframes coin-fall {
@@ -264,9 +261,9 @@
   transition: opacity 0.5s ease-out, filter 0.5s ease-out;
 }
 
-/* Progress bar */
+/* Progress bar - 3-stop gradient */
 .progress-gold {
-  background: linear-gradient(90deg, var(--gold), var(--rope));
+  background: linear-gradient(90deg, #8b6914 0%, #c9922a 50%, #e5b84a 100%);
 }
 
 /* Glow effect for selected cards */
@@ -282,4 +279,103 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   opacity: 0.03;
   pointer-events: none;
+}
+
+/* Mesh gradient navy background */
+.mesh-gradient-navy {
+  background:
+    radial-gradient(at 20% 30%, rgba(13, 30, 51, 0.9) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(42, 157, 143, 0.18) 0%, transparent 50%),
+    radial-gradient(at 60% 20%, rgba(201, 146, 42, 0.10) 0%, transparent 50%),
+    radial-gradient(at 30% 80%, rgba(139, 105, 20, 0.12) 0%, transparent 50%),
+    #0a1628;
+  background-size: 200% 200%;
+  animation: mesh-drift 25s ease-in-out infinite;
+}
+
+@keyframes mesh-drift {
+  0%, 100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%; }
+  50% { background-position: 50% 50%, 50% 0%, 0% 100%, 100% 50%; }
+}
+
+/* Float diagonal animation for ambient doubloons */
+@keyframes floatDiagonal {
+  0% { transform: translate(0, 0) rotateY(0deg); }
+  100% { transform: translate(120vw, -50vh) rotateY(720deg); }
+}
+
+/* Fog drift animation */
+@keyframes fogDrift {
+  0% { transform: translateX(-20px) translateY(0); opacity: 0.4; }
+  100% { transform: translateX(40px) translateY(-15px); opacity: 0.8; }
+}
+
+/* Shooting star animation */
+@keyframes shootingStar {
+  0% { transform: translate(0,0) scaleX(0); opacity: 0; }
+  20% { opacity: 1; transform: translate(0,0) scaleX(1); }
+  100% { transform: translate(300px, 200px) scaleX(0); opacity: 0; }
+}
+
+/* Hub pulse animation for wheel */
+@keyframes hub-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(201,146,42,0)); }
+  50% { filter: drop-shadow(0 0 20px rgba(201,146,42,0.6)); }
+}
+
+/* Grain shift animation */
+@keyframes grain-shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 256px 256px; }
+}
+
+.animate-grain { animation: grain-shift 8s steps(4) infinite; }
+.animate-hub-pulse { animation: hub-pulse 2s ease-in-out infinite; }
+.spoke-glow { filter: drop-shadow(0 0 8px rgba(201,146,42,0.7)); transition: filter 300ms; }
+
+/* Gold border card with shimmer */
+.card-gold-border {
+  position: relative;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(135deg, rgba(201,146,42,0.6), rgba(139,105,20,0.4), rgba(42,157,143,0.5), rgba(201,146,42,0.6)) border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: border-shimmer 6s linear infinite;
+}
+
+@keyframes border-shimmer {
+  0% { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 300% 50%; }
+}
+
+/* Coin arc animation for flying coins */
+@keyframes coin-arc-fly {
+  0% { transform: translate(0,0) scale(1) rotateY(0deg); opacity: 1; }
+  50% { transform: translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.5 + var(--peak-y))) scale(1.15) rotateY(360deg); opacity: 1; }
+  100% { transform: translate(var(--end-x), var(--end-y)) scale(0.4) rotateY(720deg); opacity: 0; }
+}
+
+/* Checkbox tick animation */
+@keyframes tick-scale {
+  0% { transform: scale(0) rotate(-45deg); }
+  50% { transform: scale(1.2) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Strikethrough animation */
+@keyframes strikethrough {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.animate-tick { animation: tick-scale 300ms ease-out forwards; }
+.animate-strikethrough::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  background: currentColor;
+  animation: strikethrough 200ms ease-out 100ms forwards;
 }

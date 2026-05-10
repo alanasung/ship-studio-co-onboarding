@@ -140,56 +140,51 @@ interface FlyingCoinProps {
 }
 
 export function FlyingCoin({ startX, startY, delay = 0, onComplete }: FlyingCoinProps) {
-  const [style, setStyle] = useState<React.CSSProperties>({
-    position: 'fixed',
-    left: startX - 24,
-    top: startY - 24,
-    zIndex: 100,
-    opacity: 0,
-    transform: 'scale(0.5)',
-    transition: 'none',
-  })
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [cssVars, setCssVars] = useState<React.CSSProperties>({})
 
   useEffect(() => {
     const startTimer = setTimeout(() => {
-      // Start position
-      setStyle(prev => ({
-        ...prev,
-        opacity: 1,
-        transform: 'scale(1)',
-      }))
+      const target = getCounterPosition()
+      if (!target) {
+        onComplete()
+        return
+      }
 
-      // Animate to counter after a brief pause
-      const animateTimer = setTimeout(() => {
-        const target = getCounterPosition()
-        if (!target) {
-          onComplete()
-          return
-        }
+      // Calculate the arc parameters
+      const deltaX = target.x - startX
+      const deltaY = target.y - startY
+      const peakY = -120 // Rise 120px above midpoint
 
-        setStyle({
-          position: 'fixed',
-          left: target.x - 24,
-          top: target.y - 24,
-          zIndex: 100,
-          opacity: 1,
-          transform: 'scale(0.5)',
-          transition: 'all 700ms cubic-bezier(0.25, 0.1, 0.25, 1)',
-        })
+      setCssVars({
+        '--end-x': `${deltaX}px`,
+        '--end-y': `${deltaY}px`,
+        '--peak-y': `${peakY}px`,
+      } as React.CSSProperties)
+      
+      setIsAnimating(true)
 
-        // Complete after animation
-        const completeTimer = setTimeout(onComplete, 700)
-        return () => clearTimeout(completeTimer)
-      }, 50)
-
-      return () => clearTimeout(animateTimer)
+      // Complete after animation
+      const completeTimer = setTimeout(onComplete, 800)
+      return () => clearTimeout(completeTimer)
     }, delay)
 
     return () => clearTimeout(startTimer)
   }, [startX, startY, delay, onComplete])
 
+  if (!isAnimating) return null
+
   return (
-    <div style={style}>
+    <div 
+      style={{
+        position: 'fixed',
+        left: startX - 24,
+        top: startY - 24,
+        zIndex: 100,
+        animation: 'coin-arc-fly 800ms ease-out forwards',
+        ...cssVars,
+      }}
+    >
       <CoinSVG size={48} />
     </div>
   )

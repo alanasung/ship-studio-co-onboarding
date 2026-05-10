@@ -18,6 +18,9 @@ export interface UserData {
   phone: string
   nationality: string
   residence: string
+  bio?: string
+  school?: string
+  photoUrl?: string
 }
 
 export interface DoubloonEvent {
@@ -61,6 +64,9 @@ export interface AppState {
   referralCount: number
   currentStreak: number
   lastPostDate?: string
+  dailyQuestClaimedDate?: string
+  weeklyQuestClaimedWeek?: string
+  profileCompletionRewarded?: boolean
 }
 
 export const initialUserData: UserData = {
@@ -127,6 +133,9 @@ export const initialAppState: AppState = {
   referralCount: 0,
   currentStreak: 0,
   lastPostDate: undefined,
+  dailyQuestClaimedDate: undefined,
+  weeklyQuestClaimedWeek: undefined,
+  profileCompletionRewarded: false,
 }
 
 // Helper function to create a referral code from user data
