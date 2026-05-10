@@ -16,7 +16,7 @@ import { DashboardScreen } from '@/components/screens/dashboard-screen'
 import { SoundToggle } from '@/components/sound-toggle'
 import { ShipHelper } from '@/components/ship-helper'
 import { DoubloonShower } from '@/components/doubloon-shower'
-import { achievementChord } from '@/lib/sounds'
+import { achievementChord, swoosh, startAmbient, startLanternCreak, chime, hapticMedium, hapticHeavy } from '@/lib/sounds'
 
 const STORAGE_KEY = 'bounty_state_v2'
 
@@ -78,6 +78,22 @@ export default function BountyApp() {
     setIsLoaded(true)
   }, [])
 
+  // Start ambient sounds on first user interaction
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      startAmbient()
+      startLanternCreak()
+      window.removeEventListener('click', handleFirstInteraction)
+      window.removeEventListener('keydown', handleFirstInteraction)
+    }
+    window.addEventListener('click', handleFirstInteraction, { once: true })
+    window.addEventListener('keydown', handleFirstInteraction, { once: true })
+    return () => {
+      window.removeEventListener('click', handleFirstInteraction)
+      window.removeEventListener('keydown', handleFirstInteraction)
+    }
+  }, [])
+
   // Save to localStorage on state change
   useEffect(() => {
     if (isLoaded) {
@@ -86,6 +102,7 @@ export default function BountyApp() {
   }, [state, isLoaded])
 
   const setScreen = useCallback((screen: Screen) => {
+    swoosh()
     setState(prev => ({ ...prev, screen }))
   }, [])
 
@@ -147,6 +164,8 @@ export default function BountyApp() {
       const { newAchievements, totalReward } = checkAndAwardAchievements(newState)
       if (newAchievements.length > 0) {
         achievementChord()
+        chime()
+        hapticMedium()
         return {
           ...newState,
           doubloons: newState.doubloons + totalReward,
@@ -239,6 +258,8 @@ const earnDoubloons = useCallback((amount: number, reason: string, clickX?: numb
       const { newAchievements, totalReward } = checkAndAwardAchievements(newState)
       if (newAchievements.length > 0) {
         achievementChord()
+        chime()
+        hapticMedium()
         return {
           ...newState,
           doubloons: newState.doubloons + totalReward,
@@ -268,6 +289,7 @@ const earnDoubloons = useCallback((amount: number, reason: string, clickX?: numb
   const completeRoleOnboarding = useCallback((role: Role) => {
     // Show celebration
     setShowCelebration(true)
+    hapticHeavy()
 
     setState(prev => ({
       ...prev,

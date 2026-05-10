@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Role } from '@/lib/types'
-import { OceanAtmosphere } from '@/components/ocean-atmosphere'
-import { pageTurn } from '@/lib/sounds'
+import { DepthScene } from '@/components/depth-scene'
+import { NauticalEnvironment } from '@/components/nautical-environment'
+import { pageTurn, paper } from '@/lib/sounds'
+import { SoundButton } from '@/components/sound-button'
 
 interface PirateScrollProps {
   scenes: ReactNode[]
@@ -35,6 +37,7 @@ export function PirateScroll({
     if (currentScene < scenes.length - 1 && !isAnimating) {
       setIsAnimating(true)
       pageTurn()
+      paper()
       setTimeout(() => {
         setCurrentScene(currentScene + 1)
         setIsAnimating(false)
@@ -46,6 +49,7 @@ export function PirateScroll({
     if (currentScene > 0 && !isAnimating) {
       setIsAnimating(true)
       pageTurn()
+      paper()
       setTimeout(() => {
         setCurrentScene(currentScene - 1)
         setIsAnimating(false)
@@ -59,7 +63,7 @@ export function PirateScroll({
 
   return (
     <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-hidden">
-      <OceanAtmosphere variant="full" />
+      
 
       {/* Role queue indicator */}
       {showRoleIndicator && (
@@ -217,7 +221,7 @@ export function ScrollButton({
   }
 
   return (
-    <button
+    <SoundButton
       onClick={onClick}
       disabled={disabled}
       className={`px-6 py-3 font-mono font-bold rounded-lg border-2 
@@ -226,18 +230,18 @@ export function ScrollButton({
         ${variants[variant]} ${className}`}
     >
       {children}
-    </button>
+    </SoundButton>
   )
 }
 
 export function NextButton({ onClick, children = 'Next' }: { onClick: () => void; children?: ReactNode }) {
   return (
-    <button
+    <SoundButton
       onClick={onClick}
       className="mt-8 px-6 py-3 bg-navy text-gold font-mono font-bold rounded-lg border-2 border-gold/30
         transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] hover:bg-navy/90"
     >
       {children} &rarr;
-    </button>
+    </SoundButton>
   )
 }

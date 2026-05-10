@@ -4,7 +4,9 @@ import { useState, useEffect, useMemo } from 'react'
 import type { AppState, Role, UserData, Achievement } from '@/lib/types'
 import { TrendingUp, Telescope, Anchor, ChevronDown, ChevronUp, Pencil, X, Lock, Check, Copy, ExternalLink, Flame } from 'lucide-react'
 import { ding } from '@/lib/audio'
-import { OceanAtmosphere } from '@/components/ocean-atmosphere'
+import { DepthScene } from '@/components/depth-scene'
+import { NauticalEnvironment } from '@/components/nautical-environment'
+import { SoundButton } from '@/components/sound-button'
 
 interface DashboardScreenProps {
   state: AppState
@@ -190,7 +192,7 @@ export function DashboardScreen({
 
   return (
     <div className="min-h-screen mesh-gradient-navy relative">
-      <OceanAtmosphere variant="full" />
+      
       
       {/* Header */}
       <header className="relative z-10 border-b border-border/30 p-4">
@@ -292,7 +294,7 @@ export function DashboardScreen({
         </div>
 
         {/* Daily & Weekly Quests */}
-        <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+        <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
           <h3 className="font-serif text-xl text-parchment mb-4">Active Quests</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {/* Daily Quest */}
@@ -359,7 +361,7 @@ export function DashboardScreen({
         </div>
 
         {/* Achievements */}
-        <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+        <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
           <h3 className="font-serif text-xl text-parchment mb-4">Achievements</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {achievements.map(achievement => (
@@ -371,7 +373,7 @@ export function DashboardScreen({
         {/* Grid layout */}
         <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           {/* My Roles */}
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">My Roles</h3>
             <div className="space-y-4">
               {selectedRoles.includes('growth') && (
@@ -439,7 +441,7 @@ export function DashboardScreen({
           </div>
 
           {/* Doubloon History */}
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">Doubloon History</h3>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {doubloonHistory.length === 0 ? (
@@ -474,7 +476,7 @@ export function DashboardScreen({
           </div>
 
           {/* Engagement Inbox */}
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">Engagement Inbox</h3>
             <div className="space-y-3">
               {pendingTasks.map(task => (
@@ -519,7 +521,7 @@ export function DashboardScreen({
           </div>
 
           {/* Leaderboard */}
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">{"This Week's Top Crew"}</h3>
             <div className="space-y-2">
               {leaderboardWithUser.map((entry, index) => (
@@ -546,7 +548,7 @@ export function DashboardScreen({
           </div>
 
           {/* Recruit Crew (Referrals) */}
-          <div className="bg-card rounded-lg border border-gold/20 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-gold/20 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">Recruit Crew</h3>
             <p className="font-mono text-xs text-parchment/70 mb-4">
               +25 doubloons per crew member who joins
@@ -579,7 +581,7 @@ export function DashboardScreen({
 
           {/* Resources */}
           {(selectedRoles.includes('growth') || selectedRoles.includes('venture')) && (
-            <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+            <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
               <h3 className="font-serif text-xl text-parchment mb-4">Resources</h3>
               <div className="space-y-4">
                 <div>
@@ -626,7 +628,7 @@ export function DashboardScreen({
           )}
 
           {/* What are Doubloons? */}
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <button
               onClick={() => setShowDoubloonInfo(!showDoubloonInfo)}
               className="w-full flex items-center justify-between"
@@ -665,7 +667,7 @@ export function DashboardScreen({
 
         {/* Add a Role */}
         {availableRoles.length > 0 && (
-          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6">
+          <div className="bg-card rounded-lg border border-border/30 p-4 md:p-6 depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-4">Add a Role</h3>
             <div className="flex flex-wrap gap-4">
               {availableRoles.map(role => (
@@ -685,7 +687,7 @@ export function DashboardScreen({
 
         {/* Cohort Application - always visible if not selected */}
         {!selectedRoles.includes('cohort') && (
-          <div className="bg-card rounded-lg border border-gold/30 p-4 md:p-6 text-center">
+          <div className="bg-card rounded-lg border border-gold/30 p-4 md:p-6 text-center depth-card-hover">
             <h3 className="font-serif text-xl text-parchment mb-2">Ready for the next level?</h3>
             <p className="font-mono text-parchment/70 text-sm mb-4">
               Apply to join the next SH1P cohort

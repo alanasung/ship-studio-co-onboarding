@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { hapticLight } from '@/lib/sounds'
 
 interface DoubloonCounterProps {
   count: number
@@ -53,6 +54,7 @@ export function DoubloonCounter({ count, showAnimation }: DoubloonCounterProps) 
   useEffect(() => {
     const diff = count - prevCountRef.current
     if (diff > 0) {
+      hapticLight()
       setShowGlow(true)
       setFloatingAmount(diff)
       

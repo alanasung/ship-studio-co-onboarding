@@ -3,9 +3,11 @@
 import { useState, useRef } from 'react'
 import type { Role } from '@/lib/types'
 import { CoinAnimation } from '@/components/doubloon-counter'
-import { ding } from '@/lib/sounds'
+import { ding, stamp, hapticLight } from '@/lib/sounds'
 import { TrendingUp, Telescope, Anchor } from 'lucide-react'
-import { OceanAtmosphere } from '@/components/ocean-atmosphere'
+import { DepthScene } from '@/components/depth-scene'
+import { NauticalEnvironment } from '@/components/nautical-environment'
+import { SoundButton } from '@/components/sound-button'
 
 interface RoleSelectScreenProps {
   selectedRoles: Role[]
@@ -75,6 +77,8 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const toggleRole = (role: Role) => {
+    stamp()
+    hapticLight()
     if (selectedRoles.includes(role)) {
       onSelect(selectedRoles.filter(r => r !== role))
       setJustSelected(null)
@@ -103,7 +107,7 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
 
   return (
     <div className="fixed inset-0 mesh-gradient-navy flex flex-col items-center justify-center p-4">
-      <OceanAtmosphere variant="minimal" />
+      
       {showCoinAnimation && <CoinAnimation onComplete={handleAnimationComplete} />}
       
       <div className="relative z-10 text-center mb-8">
@@ -124,7 +128,7 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
               key={role}
               onClick={() => toggleRole(role)}
               className={`flex-1 relative p-6 rounded-lg border-2 transition-all duration-300
-                hover:scale-[1.02] active:scale-[0.98] text-left card-gold-border
+                hover:scale-[1.02] active:scale-[0.98] text-left card-gold-border depth-card-hover
                 ${isSelected 
                   ? 'border-gold bg-gold/10 glow-gold' 
                   : 'border-rope/30 bg-navy/50 hover:border-rope/60'
@@ -149,7 +153,7 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
       )}
 
       {/* CTA Button */}
-      <button
+      <SoundButton
         ref={buttonRef}
         onClick={handleClaim}
         disabled={selectedRoles.length === 0 || isAnimating}
@@ -160,7 +164,7 @@ export function RoleSelectScreen({ selectedRoles, onSelect, onClaim }: RoleSelec
           }`}
       >
         Claim 10 Doubloons &rarr;
-      </button>
+      </SoundButton>
     </div>
   )
 }

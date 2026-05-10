@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { DepthScene } from '@/components/depth-scene'
 import { NauticalEnvironment } from '@/components/nautical-environment'
+import { fogHorn } from '@/lib/sounds'
 
 interface IntroScreenProps {
   onComplete: () => void
@@ -17,7 +18,10 @@ export function IntroScreen({ onComplete }: IntroScreenProps) {
     const timers: NodeJS.Timeout[] = []
     
     // 0.0-0.5s: Black screen
-    timers.push(setTimeout(() => setPhase('fadein'), 500))
+    timers.push(setTimeout(() => {
+      setPhase('fadein')
+      fogHorn()
+    }, 500))
     
     // 0.5-1.5s: Fade in ocean
     timers.push(setTimeout(() => setPhase('ship'), 1500))

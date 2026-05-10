@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import type { UserData } from '@/lib/types'
-import { OceanAtmosphere } from '@/components/ocean-atmosphere'
+import { DepthScene } from '@/components/depth-scene'
+import { NauticalEnvironment } from '@/components/nautical-environment'
+import { SoundButton } from '@/components/sound-button'
 
 interface SignupScreenProps {
   initialData: UserData
@@ -77,7 +79,7 @@ export function SignupScreen({ initialData, onSubmit }: SignupScreenProps) {
 
   return (
     <div className="fixed inset-0 mesh-gradient-navy flex items-center justify-center p-4 overflow-y-auto">
-      <OceanAtmosphere variant="minimal" />
+      
 
       {/* Background wheel - blurred and rotating */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.06] blur-xl pointer-events-none overflow-hidden">
@@ -277,14 +279,14 @@ export function SignupScreen({ initialData, onSubmit }: SignupScreenProps) {
           </div>
 
           {/* Submit */}
-          <button
+          <SoundButton
             type="submit"
             className="w-full mt-6 px-8 py-4 bg-navy text-gold font-mono font-bold text-lg rounded-lg 
               hover:bg-navy/90 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
               shadow-lg border-2 border-gold/30"
           >
             Set Sail &rarr;
-          </button>
+          </SoundButton>
         </form>
       </div>
     </div>
